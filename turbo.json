@@ -1,0 +1,11 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "dev": { "cache": false, "persistent": true },
+    "prepare": { "cache": false },
+    "build": { "dependsOn": ["^build", "prepare"], "outputs": [".output/chrome-mv3/**"] },
+    "typecheck": { "dependsOn": ["^typecheck", "prepare"], "outputs": [] },
+    "test": { "dependsOn": ["prepare"], "outputs": [] }
+  }
+}

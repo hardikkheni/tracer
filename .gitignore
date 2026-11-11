@@ -1,1 +1,10 @@
+.scratch/
+node_modules/
+.turbo/
+.wxt/
+.output/
+coverage/
+*.tsbuildinfo
+.DS_Store
+web-ext.config.ts
 .scratch

@@ -1,0 +1,20 @@
+@import 'tailwindcss';
+
+/* Use pixel-based theme values: rem would follow the host page's root font size. */
+@theme {
+  --spacing: 4px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --radius-md: 6px;
+  --color-primary: #18181b;
+  --color-primary-foreground: #fafafa;
+  --color-ring: #2563eb;
+}
+
+/* Set typography inside the boundary; WXT resets :host with all: initial !important. */
+.tracer-shell {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color-scheme: light;
+}

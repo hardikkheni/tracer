@@ -1,0 +1,4 @@
+{
+  "extends": ["./.wxt/tsconfig.json", "@tracer/tsconfig/base.json"],
+  "compilerOptions": { "jsx": "react-jsx" }
+}

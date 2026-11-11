@@ -1,0 +1,13 @@
+{
+  "name": "tracer",
+  "private": true,
+  "packageManager": "pnpm@12.11.2",
+  "engines": { "node": "24.14.0", "pnpm": "12.11.2" },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test"
+  },
+  "devDependencies": { "turbo": "2.11.10" }
+}
