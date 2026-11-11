@@ -26,12 +26,65 @@ preparation lifecycle; commands also prepare framework types themselves.
 | --- | --- |
 | `pnpm dev` | Persistent, uncached WXT/Vite development server for Chrome |
 | `pnpm build` | Chrome production build in `apps/extension/.output/chrome-mv3/` |
+| `pnpm format` | Apply Biome formatting to owned source/configuration |
+| `pnpm format:check` | Verify formatting without changing files (`biome check`) |
+| `pnpm lint` | Check Biome lint rules without fixes; warnings fail |
 | `pnpm typecheck` | Prepare WXT types, then strict TypeScript checking |
 | `pnpm test` | Prepare WXT types, then non-watch Vitest tests |
+| `pnpm verify` | Run formatting, lint, types, all tests, and Chrome build in CI order |
+| `pnpm hooks:install` | Explicitly install the local Lefthook pre-commit hook |
 
 Turborepo orders preparation before build, type-checking, and tests, and tracks
 workspace dependencies for build/type-check tasks. Build output is cached;
 development and preparation are not. No earlier development run is needed.
+Biome runs once at the root without task caching: it checks repository-wide inputs,
+not generated WXT types. Turborepo continues to orchestrate the workspace's prepared
+type-check, test, and build tasks.
+
+Before committing, run `pnpm format`, review the diff, and run `pnpm verify`.
+GitHub Actions installs Node from `.nvmrc`, pnpm from `package.json`, then runs
+`pnpm install --frozen-lockfile` and the same `pnpm verify` command. Verification
+never fixes source files; any failed check stops the sequence and fails the job.
+No publishing, secrets, or remote task cache are involved.
+
+### Local hooks and troubleshooting
+
+After installing dependencies in a Git checkout, run:
+
+```sh
+pnpm hooks:install
+```
+
+Dependency installation deliberately does not install hooks. Lefthook's pre-commit
+hook runs only fast, non-mutating `biome check` formatting and lint checks on staged
+source/configuration paths. It skips documentation-only/empty applicable changes
+successfully and does not run types, tests, or builds. It neither writes nor stages
+files. For partially staged files it checks the current working copy at each staged
+path, not an isolated copy of the index; review and stage your intended fixes yourself.
+Full verification still belongs in `pnpm verify` and CI.
+
+Biome covers JS/TS (including JSX/TSX), JSON/JSONC, CSS (with Tailwind directives),
+and YAML. It honors Git ignores and excludes dependencies, `.wxt`, `.output`,
+`.turbo`, coverage, `dist`, scratch files, machine-local `web-ext.config.ts`, and
+the generated pnpm lockfile. Markdown guidance and vendored licenses are left alone.
+Biome is the only supported formatter/linter; do not add parallel Prettier/ESLint
+configurations. `pnpm format` only formats; lint fixes must be reviewed separately.
+
+- A hook failure prints the path and rule/diff. Run `pnpm format`, fix remaining
+  lint errors, review changes, and explicitly stage only the intended edits.
+- If hooks do not run, rerun `pnpm hooks:install` and check
+  `git config --get core.hooksPath` for a conflicting hook manager. Node and pnpm
+  must be on the Git client's PATH (including when committing from a GUI).
+- For version/install failures, use the pinned versions above. pnpm's
+  `engineStrict`, `saveExact`, and dependency script permissions live in
+  `pnpm-workspace.yaml`; Lefthook's install script is intentionally denied there.
+  Commit lockfile updates with dependency changes; do not bypass frozen mode in CI.
+- Missing `.wxt` types: run root commands rather than bare `tsc`. Root tasks prepare
+  types automatically. No development-server session is required.
+- To bypass a suspected stale local Turbo result during diagnosis, run
+  `pnpm exec turbo run typecheck test build --force`. CI starts without task caches.
+
+Actual local checks and their limits: [contributor verification results](docs/contributor-verification.md).
 
 Development intentionally does **not** open a browser. Run `pnpm dev`, then load
 `apps/extension/.output/chrome-mv3-dev/` unpacked using the steps below. Keep the

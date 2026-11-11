@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /* Use pixel-based theme values: rem would follow the host page's root font size. */
 @theme {
