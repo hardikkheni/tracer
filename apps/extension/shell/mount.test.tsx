@@ -136,7 +136,9 @@ test('a replacement content-script context removes the previous visible shell', 
   contexts.push(first);
   const oldShell = await createShell(first);
   await act(async () => oldShell.mount());
-  await userEvent.setup().click(within(oldShell.uiContainer).getByRole('button', { name: 'Tracer Floating Launcher' }));
+  await userEvent
+    .setup()
+    .click(within(oldShell.uiContainer).getByRole('button', { name: 'Tracer Floating Launcher' }));
 
   let next!: ContentScriptContext;
   await act(async () => {
@@ -149,8 +151,14 @@ test('a replacement content-script context removes the previous visible shell', 
   expect(oldShell.shadowHost).not.toBeInTheDocument();
   expect(within(oldShell.uiContainer).queryByRole('button')).not.toBeInTheDocument();
   expect(within(oldShell.uiContainer).queryByRole('dialog')).not.toBeInTheDocument();
-  expect(within(newShell.uiContainer).getAllByRole('button', { name: 'Tracer Floating Launcher' })).toHaveLength(1);
+  expect(
+    within(newShell.uiContainer).getAllByRole('button', { name: 'Tracer Floating Launcher' }),
+  ).toHaveLength(1);
   expect(within(newShell.uiContainer).queryByRole('dialog')).not.toBeInTheDocument();
-  await userEvent.setup().click(within(newShell.uiContainer).getByRole('button', { name: 'Tracer Floating Launcher' }));
-  expect(within(newShell.uiContainer).getAllByRole('dialog', { name: 'Tracer Console Panel' })).toHaveLength(1);
+  await userEvent
+    .setup()
+    .click(within(newShell.uiContainer).getByRole('button', { name: 'Tracer Floating Launcher' }));
+  expect(
+    within(newShell.uiContainer).getAllByRole('dialog', { name: 'Tracer Console Panel' }),
+  ).toHaveLength(1);
 });
