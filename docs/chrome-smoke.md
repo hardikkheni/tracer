@@ -1,6 +1,48 @@
-# Chrome smoke results — ticket 01
+# Chrome smoke results
 
-## Environment and method
+## Ticket 02 — accessible Console Panel
+
+Verified on **2026-11-12** using installed **Google Chrome 157.0.8103.50** on
+macOS arm64, headless with an isolated temporary profile. A one-off DevTools
+Protocol harness loaded the actual production build with `Extensions.loadUnpacked`
+and navigated to locally served, permitted HTTP pages. Automatic injection came
+from the declarative content script, not harness-injected application code.
+This is not a committed E2E suite or human visual inspection.
+
+Both pages had aggressive global `button`, `section`, `h2`, and `p` styles using
+`!important`; root font sizes were 16px and 32px respectively. Actual results:
+
+| Check | Result |
+| --- | --- |
+| Automatic appearance, no toolbar click | One Floating Launcher; Console Panel initially absent; `aria-expanded=false` |
+| Real Tab navigation across Shadow DOM | Reached launcher with visible focus indicator |
+| Enter opens | One Console Panel; `aria-expanded=true`; focus on visible-focus close button |
+| Honest placeholder | States log capture is not yet implemented and no collection/access to native DevTools history |
+| Escape inside panel | Closed panel and restored launcher focus |
+| Space reopens; Enter on close button | Reopened, then closed with launcher focus restored |
+| Pointer activation | Launcher open/toggle-close/reopen and close-button interactions succeeded |
+| Repeated opening and page reload | One shell/launcher, no duplicate panels; reload starts closed |
+| Navigation / popup | Same page URL, no additional non-blank page targets |
+| Launcher styling on both pages | 56 × 56px, 24px bottom/right, 14px Arial, dark background |
+| Panel styling on both pages | 480 × 130px, 24px right / 96px bottom, 14px Arial, white background, no horizontal overflow |
+| Close control styling | 32px high, 12px Arial, dark background; unaffected by host 40px/red button rules |
+| Host page styling | Host button remained 300px/red/40px; host paragraph remained 20px |
+| UI boundary | Panel remained inside Shadow DOM, absent from host body queries; no portal-based controls used |
+
+The harness initially omitted Enter's text payload in its DevTools Protocol key
+event, so Chrome did not activate the button. Adding the real Enter payload
+(`text: '\r'`) corrected the harness; the entire check then passed. No application
+change was needed for this harness issue.
+
+Human visual inspection, screen-reader output, site-access settings UI,
+withheld/restored permissions, protected pages, remote HTTPS, and host-form
+submission were **not** exercised. These remain manual checks in `README.md`.
+The headless run proves the measured layout and keyboard interactions on these
+two pages, not immunity to every hostile host page.
+
+## Ticket 01 — historical launcher-only baseline
+
+### Environment and method
 
 Verified on **2026-11-12** using installed **Google Chrome 157.0.8103.50** on
 macOS arm64. Chrome ran headless with an isolated temporary profile and
@@ -14,7 +56,7 @@ function, or click a toolbar control. The extension's declarative content script
 performed injection. This was a one-off real-browser smoke check, not a committed
 E2E suite and not a jsdom simulation.
 
-## Actual results
+### Actual results
 
 | Check | Result |
 | --- | --- |
@@ -38,7 +80,7 @@ or `host_permissions`, and only the UI stylesheet as a web-accessible resource.
 The stylesheet is fetched into WXT's shadow boundary rather than declared as
 page-wide content-script CSS.
 
-## Remaining manual checks
+### Remaining manual checks
 
 No human-operated Chrome **Load unpacked** dialog or visual inspection was
 performed. The headless check did not exercise Chrome's site-access settings UI,
